@@ -4,8 +4,8 @@
         <a class="button tninja-reroll" title="Copy to clipboard" onclick="tninjaCopyToClipboard('tninja-text-{{this.id}}')"><i class="fa fa-copy"></i></a>
         <label class="tninja-label">{{this.name}}</label>
     </div>
-    <div id="tninja-text-{{this.id}}" onclick="ui.tableNinja.choose('tninja-choose-{{this.id}}')" class="tninja-text" onchange="overflowManager('{{this.id}}');">
-        {{tableNinjaSelectedText this}}
+    <div id="tninja-text-{{this.id}}" class="tninja-text" onchange="overflowManager('{{this.id}}');">
+        {{{tableNinjaSelectedText this}}}
     </div>
 </div>
 

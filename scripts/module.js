@@ -62,7 +62,9 @@ class TableNinja extends Application {
             if (this.rendered) {
                 this.close();
             } else {
+	        this.sortChildren(this.data);
                 this.render(true);
+                this.activateListeners();
             }
         }
 
@@ -71,8 +73,20 @@ class TableNinja extends Application {
     async refresh() {
         this.initData(this.data).then((promise) => {
             this.data = promise;
+	    this.sortChildren(this.data);
             this.render();
         });
+    }
+
+    sortChildren(data) {
+	    if(data.childEntities) {
+		    data.childEntities.forEach(c => {
+			    if(c.isFolder) {
+				    this.sortChildren(c);
+			    }
+		    });
+		    data.childEntities.sort((d1, d2) => { return d1.data.name < d2.data.name ? -1 : 1; })
+	    }
     }
 
     async initData(folder = null) {
@@ -93,8 +107,9 @@ class TableNinja extends Application {
             }
         }
         if (typeof tables !== 'undefined') {
-            for (let i = 0; i < tables.length; i++) {
-                let table = tables[i];
+	    let sortedTables = [...tables].sort((t1, t2) => {return t1.data.name < t2.data.name ? -1 : 1});
+            for (let i = 0; i < sortedTables.length; i++) {
+                let table = sortedTables[i];
                 if (typeof table.ninjaRoll === "undefined") {
                     // Add a special roll function to the table.
                     table.ninjaRoll = async function () {
@@ -106,9 +121,9 @@ class TableNinja extends Application {
                     }
                 }
                 // Preroll a list of results from the table.
-                table.ninjaRoll().then((promise) => {
+                table.ninjaRoll().then(promise => {
                     folder.childEntities.push(promise);
-                });
+		});
             }
         }
 
@@ -167,7 +182,28 @@ async function preloadHandlebarsTemplates() {
 
 Handlebars.registerHelper('tableNinjaSelectedText', function (table) {
     const result = table.rolls[table.selected];
-    return result.text || (result.data ? result.data.text : null);
+    console.log("result");
+    console.log(result);
+    let resultData = result.data;
+    if (resultData) {
+        if(resultData.resultId && resultData.collection) {
+            if(resultData.collection.indexOf(".") !== -1) {
+                return '<a class="entity-link" draggable="true" data-pack="' + resultData.collection + '" data-id="'+ resultData.resultId +'">' +
+                    '<i class="fas fa-suitcase"></i> ' +
+                    resultData.text +
+                    '</a>';
+            } else {
+                return '<a class="entity-link" draggable="true" data-entity="' + resultData.collection + '" data-id="'+ resultData.resultId +'">' +
+                    '<i class="fas fa-suitcase"></i> ' +
+                    resultData.text +
+                    '</a>';
+            }
+        } else {
+            return resultData.text || result.text;
+        }
+    } else {
+        return result.text;
+    }
 })
 
 Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {

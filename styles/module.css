@@ -13,6 +13,9 @@ li.scene-control[data-control="table-ninja"], li.scene-control[data-control="tab
 #tninja-prime .window-content {
     padding: 0;
 }
+section.tninja-tab-content {
+	flex: none !important;
+}
 .tninja-content .tab.active {
     padding: 53px 10px 50px 10px;
     position:relative;
@@ -85,7 +88,7 @@ li.scene-control[data-control="table-ninja"], li.scene-control[data-control="tab
     width: 200px;
     position: relative;
     overflow: hidden;
-    max-height: 105px;
+    max-height: 150px;
 }
 .tninja-text {
     cursor: pointer;
